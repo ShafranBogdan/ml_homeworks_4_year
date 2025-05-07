@@ -1,0 +1,11 @@
+{
+  "os": "macOS-14.2.1-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.13.0",
+  "startedAt": "2025-03-23T16:03:30.260986Z",
+  "program": "/Users/bogdanshafran/projects/ml_mipt_dafe-main/01_Pytorch_NN/example_project/test_basic.py",
+  "codePath": "test_basic.py",
+  "root": "/Users/bogdanshafran/projects/ml_mipt_dafe-main/01_Pytorch_NN/example_project",
+  "host": "10.211.13.92-vpn.dhcp.yndx.net",
+  "executable": "/Users/bogdanshafran/projects/ml_mipt_dafe-main/.venv/bin/python3",
+  "codePathLocal": "test_basic.py"
+}

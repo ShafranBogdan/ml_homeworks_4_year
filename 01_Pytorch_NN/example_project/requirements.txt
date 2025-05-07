@@ -1,0 +1,8 @@
+torch
+torchvision
+tqdm==4.64.1
+pytest==7.2.1
+wandb
+urllib3
+dvc==2.10.2
+pytest-cov
