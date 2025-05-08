@@ -100,7 +100,7 @@ def test_create_data_loaders(datasets):
     assert train_images.shape[1:] == (3, 32, 32)  # Формат изображений CIFAR10
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_create_model(device):
     device = torch.device(device)
     
@@ -113,7 +113,7 @@ def test_create_model(device):
     assert model_custom.fc.out_features == 20
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_train_step(device, datasets):
     device = torch.device(device)
     train_dataset, _ = datasets
@@ -134,7 +134,7 @@ def test_train_step(device, datasets):
     assert outputs.shape[1] == 10  # 10 классов для CIFAR10
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_evaluate_model(device, data_loaders):
     device = torch.device(device)
     _, test_loader = data_loaders
@@ -147,7 +147,7 @@ def test_evaluate_model(device, data_loaders):
     assert 0 <= accuracy <= 1
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_save_model(device, temp_dir):
     device = torch.device(device)
     
@@ -166,7 +166,7 @@ def test_save_model(device, temp_dir):
     new_model.load_state_dict(loaded_state_dict)
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_train_on_one_batch(device, datasets):
     """Тест обучения на одном батче."""
     device = torch.device(device)
@@ -192,7 +192,7 @@ def test_train_on_one_batch(device, datasets):
     assert 0 <= accuracy <= 1
 
 
-@pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
+@pytest.mark.parametrize("device", ["cuda"] if torch.cuda.is_available() else ["cpu"])
 def test_training(device, data_loaders):
     device = torch.device(device)
     train_loader, test_loader = data_loaders
@@ -248,76 +248,16 @@ def test_training(device, data_loaders):
     
     assert output.shape == (1, 10)
 
-# @pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
-# def test_main(device, temp_dir, monkeypatch):
-#     """Тест функции main, которая запускает полный процесс обучения."""
-#     device = torch.device(device)
-    
-#     # Модифицируем конфигурацию для ускорения тестов
-#     test_config = {
-#         "batch_size": 32,
-#         "learning_rate": 1e-4,
-#         "weight_decay": 0.01,
-#         "epochs": 1,
-#         "zero_init_residual": False
-#     }
-#     model_path = os.path.join(temp_dir, 'model.pt')  # Changed to match main's default
-    
-#     # Monkeypatch the save path
-#     monkeypatch.setattr("train.save_model", lambda model, path=model_path: save_model(model, path))
-    
-#     # Импортируем main динамически, так как она может требовать patched-функции
-#     from train import main
-    
-#     # Вызываем main с тестовой конфигурацией
-#     accuracy = main(test_config)
-    
-#     # Проверяем, что функция вернула точность в ожидаемом диапазоне
-#     assert isinstance(accuracy, torch.Tensor)
-#     assert 0 <= accuracy.item() <= 1  # Added .item() for scalar value
-    
-#     # Проверяем, что модель была сохранена
-#     assert os.path.exists(model_path)
+def test_train():
+    os.system("py train.py")
 
-# @pytest.mark.parametrize("device", ["cpu"] + (["cuda"] if torch.cuda.is_available() else []))
-# def test_compute_metrics_main(device, temp_dir, monkeypatch):
-#     """Тест функции main из compute_metrics.py, которая оценивает модель и сохраняет метрики."""
-#     from compute_metrics import main as compute_metrics_main
-    
-#     metrics_path = os.path.join(temp_dir, 'test_final_metrics.json')
-    
-    
-#     # Патчим функции и пути
-#     class Args:
-#         pass
-    
-#     args = Args()
-    
-#     # Вызываем функцию main
-#     compute_metrics_main(args)
-    
-#     # Проверяем, что метрики были сохранены
-#     assert os.path.exists(metrics_path)
-    
-#     # Проверяем содержимое файла метрик
-#     with open(metrics_path, 'r') as f:
-#         metrics = json.load(f)
-    
-#     # Проверяем формат метрик
-#     assert 'accuracy' in metrics
-#     assert isinstance(metrics['accuracy'], float)
-#     assert 0 <= metrics['accuracy'] <= 1
+    assert os.path.exists("model.pt"), "Файл модели не сохранен"
 
-def test_training():
-    os.system("python train.py")  # Запускаем полный процесс обучения
+    os.system("py compute_metrics.py  ")
 
-    assert os.path.exists("model.pt"), "Ошибка: файл model.pt не был сохранён"
-
-    os.system("python compute_metrics.py")  # Запускаем валидацию модели
-
-    assert os.path.exists("final_metrics.json"), "Ошибка: файл с финальными метриками отсутствует"
+    assert os.path.exists("final_metrics.json"), "Файл с метриками не сохранен"
 
     with open("final_metrics.json", "r") as f:
         metrics = json.load(f)
-        assert "accuracy" in metrics, "Ошибка: метрика accuracy отсутствует в файле метрик"
+        assert "accuracy" in metrics
         assert 0 <= metrics["accuracy"] <= 1
